@@ -8,7 +8,7 @@
   </head>
   <body>
     <header>
-      <a href="/" class="header-logo">LIST</a>
+      <a href="/" class="header-logo">< BACK TO HOME</a>
     </header>
     <div class="container">
       <div class="container-header">
@@ -23,6 +23,7 @@
         <ul class="table-body">
             <!-- lists from mysql database -->
             <% items.forEach((item) => { %>
+              <div class="li-top-margin"></div>
               <li>
                 <div class="item-data">
                   <span class="id-column"><%= item.id %></span>

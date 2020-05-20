@@ -1,122 +1,123 @@
-// importing express package
-const express = require('express');
-// assigning express package to a constant called app
-const app = express();
+// import express package
+const express_package = require("express");
+// initialized express_package
+const list_app = express_package();
 
-// importing mysql package
-const mysql = require('mysql');
-
-// assigning the package to a constant called connection
-const connection = mysql.createConnection(
+// import mysql package
+const mysql_package = require("mysql");
+const mysql_connection = mysql_package.createConnection(
     {
-        host: 'localhost',
-        user: 'root',
-        password: '0000',
-        database: 'list_app',
+        host: "localhost",
+        database: "shopping_list",
+        user: "root",
+        password: "0000",
     }
 );
 
-// error message should the connection fails
-connection.connect((err) => {
-    if (err) {
-      console.log('error connecting: ' + err.stack);
-      return;
-    }
-    console.log('success');
-  });
-
-
-// connecting the app constant to the public directory
-app.use(express.static('public'));
-
-// required configuration for accessing form values
-app.use(express.urlencoded({extended: false}));
-
-
-
-// adding the route and method for the front-page
-app.get(
-    '/',
-    (req, res) => {
-        res.render('home.ejs');
+// connection status
+mysql_connection.connect(
+    (error_messaege) => {
+        if (error_messaege) {
+            Console.log("CONNECTION WITH THE DATABASE WAS NOT SUCCESSFUK" + error_messaege.stack);
+            return;
+        }
+    console.log("CONNECTION WITH THE DATABASE WAS SUCCESSFUL");
     }
 );
 
-// adding the route and method for the list-page
-app.get(
-    '/index',
+
+
+// adding css and image files
+list_app.use(express_package.static("public"));
+
+
+list_app.use(express_package.urlencoded({extended: false}));
+
+
+// home-page
+list_app.get(
+    "/",
     (req, res) => {
-        connection.query(
-            'SELECT * FROM users',
+        res.render("home.ejs"), {};
+    }
+);
+
+// index-page
+list_app.get(
+    "/index",
+    (req, res) => {
+        mysql_connection.query(
+            "SELECT * FROM lists",
             (error, results) => {
-                res.render('index.ejs', {items: results});
+                res.render("index.ejs", {items: results});
             }
         );
     }
 );
 
-// adding the route and method for rendering the new-page
-app.get(
-    '/new',
+// new-page
+list_app.get(
+    "/new",
     (req, res) => {
-        res.render('new.ejs');
+        res.render("new.ejs", {});
     }
 );
 
-// adding the route and method for posting the data on the new page to db
-app.post(
-    '/create',
+
+// adding a new list
+list_app.post(
+    "/create",
     (req, res) => {
-        connection.query(
-            'INSERT INTO users (name) VALUES (?)',
-             [req.body.itemName],
-             (error, results) => {
-                 res.redirect('/index');
+        mysql_connection.query(
+            "INSERT INTO lists (name) VALUES (?)",
+            [req.body.itemName],
+            (error, results) => {
+                res.redirect("/index");
             }
         );
     }
-);
+);  
 
-// adding the route and method for rendering the edit-page
-app.get(
-    '/edit/:id',
+// edit-page
+list_app.get(
+    "/edit/:id",
     (req, res) => {
-        connection.query(
-            'SELECT * FROM users WHERE id = ?',
+        mysql_connection.query(
+            "SELECT * FROM lists WHERE id = ?",
             [req.params.id],
             (error, results) => {
-                res.render('edit.ejs', {item: results[0]});
+                res.render("edit.ejs", {item: results[0]});
             }
         );
     }
 );
 
-// adding the route and method for posting the change made to the data in db (updating a list)
-app.post(
-    '/update/:id',
+// update a list
+list_app.post(
+    "/update/:id",
     (req, res) => {
-        connection.query(
-            'UPDATE users SET name = ? WHERE id = ?',
-            [req.body.itemName, req.params.id ],
+        mysql_connection.query(
+            "UPDATE lists SET name = ? WHERE id = ?",
+            [req.body.itemName, req.params.id],
             (error, results) => {
-                res.redirect('/index');
+                res.redirect("/index");
             }
         );
     }
 );
 
-// adding the route and method for posting the change made to the data in db (deleting a list)
-app.post(
-    '/delete/:id',
+list_app.post(
+    "/delete/:id",
     (req, res) => {
-        connection.query(
-            'DELETE FROM users WHERE id = ?',
-            [req.params.id ],
+        mysql_connection.query(
+            "DELETE FROM lists WHERE id = ?",
+            [req.params.id],
             (error, results) => {
-                res.redirect('/index');
+                res.redirect("/index");
             }
         );
     }
 );
 
-app.listen(3000);
+
+list_app.listen(3000);
